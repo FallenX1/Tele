@@ -169,8 +169,17 @@ async def play(event):
             titlegc = chat.title
             ctitle = await CHAT_TITLE(titlegc)
             thumb = await gen_thumb(videoid)
-            format = "best[height<=?720][width<=?1280]"
-            hm, ytlink = await ytdl(format, url)
+            ydl_opts = {
+               "format": "best",
+               "keepvideo": True,
+               "prefer_ffmpeg": False,
+               "geo_bypass": True,
+               "outtmpl": "%(title)s.%(ext)s",
+               "quite": True,
+            }
+            with YoutubeDL(ydl_opts) as ytdl:
+                ytdl_data = ytdl.extract_info(url, download=True)
+                ytlink = ytdl.prepare_filename(ytdl_data)
             if hm == 0:
                 await botman.edit(f"`{ytlink}`")
             elif chat_id in QUEUE:
