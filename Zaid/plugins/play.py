@@ -62,7 +62,8 @@ def ytsearch(query: str):
         duration = data["duration"]
         thumbnail = f"https://i.ytimg.com/vi/{data['id']}/hqdefault.jpg"
         videoid = data["id"]
-        return [songname, url, duration, thumbnail, videoid]
+        link = search[0]['url_suffix']
+        return [songname, url, duration, thumbnail, videoid, link]
     except Exception as e:
         print(e)
         return 0
@@ -166,21 +167,16 @@ async def play(event):
             duration = search[2]
             thumbnail = search[3]
             videoid = search[4]
+            link = search[5]
             userid = sender.id
             titlegc = chat.title
             ctitle = await CHAT_TITLE(titlegc)
             thumb = await gen_thumb(videoid)
-            ydl_opts = {
-               "format": "best",
-               "keepvideo": True,
-               "prefer_ffmpeg": False,
-               "geo_bypass": True,
-               "outtmpl": "%(title)s.%(ext)s",
-               "quite": True,
-            }
-            with YoutubeDL(ydl_opts) as ytdl:
-                ytdl_data = ytdl.extract_info(url, download=True)
-                ytlink = ytdl.prepare_filename(ytdl_data)
+            ydl_ops = {"format": "bestaudio[ext=m4a]"}
+            with YoutubeDL(ydl_ops) as ydl:
+                info_dict = ydl.extract_info(link, download=False)
+                ytlink = ydl.prepare_filename(info_dict)
+                ydl.process_info(info_dict)
             if hm == 0:
                 await botman.edit(f"`{ytlink}`")
             elif chat_id in QUEUE:
