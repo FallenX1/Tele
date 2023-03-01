@@ -39,6 +39,7 @@ from Zaid.helpers.queues import (
     pop_an_item,
     active,
 )
+from yt_dlp import YoutubeDL
 from telethon import Button, events
 from Config import Config
 
